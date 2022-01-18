@@ -1,25 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import s from "./App.module.css";
+import React, { Component } from "react";
+import Searchbar from "./Components/Searchbar/Searchbar";
+// import ImageGalleryItem from './Components/ImageGalleryItem/ImageGalleryItem';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  state = {
+    imgName: "",
+  };
+
+  handleFormSubmit = (painting) => {
+    this.setState({ imgName: painting });
+  };
+
+  render() {
+    const { imgName } = this.state;
+    return (
+      <section>
+        <Searchbar valueSubmit={this.handleFormSubmit} />
+        <main className={s.App}>
+          {/* <ImageGalleryItem searchName={imgName}/> */}
+        </main>
+      </section>
+    );
+  }
 }
 
 export default App;
