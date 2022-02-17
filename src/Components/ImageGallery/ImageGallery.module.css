@@ -1,4 +1,12 @@
 .itemsList {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+
   text-decoration: none;
   list-style: none;
+  padding-left: 0;
+  margin-left: -10px;
+  margin-top: -10px;
 }

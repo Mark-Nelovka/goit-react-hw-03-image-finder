@@ -1,16 +1,19 @@
 import { Component } from "react";
 import s from "./ImageGalleryItem.module.css";
 import { ThreeDots } from "react-loader-spinner";
+import Notiflix from "notiflix";
+import { Notify } from "notiflix/build/notiflix-notify-aio";
 import ItemsCard from "../ImageGallery/ImageGallery";
 import fetchApi from "../serviseApi.js/fecthApi";
 import LoadMore from "../Button/Button";
 import Modal from "../Modal/Modal";
+import imgNotCorrectly from "../../images/Упс.jpeg";
 export default class FetchItems extends Component {
   state = {
     imageName: [],
     name: "",
     page: 1,
-    status: "resolved",
+    status: "idle",
     showModal: false,
   };
 
@@ -48,17 +51,18 @@ export default class FetchItems extends Component {
       page: prevState.page + 1,
       status: "pending",
     }));
-
-    fetchApi(queryName, this.state.page)
-      .then((res) => {
-        return this.setState((prevState) => ({
-          imageName: [...prevState.imageName, ...res],
-          status: "resolved",
-        }));
-      })
-      .catch((error) => {
-        this.setState({ status: "rejected" });
-      });
+    setTimeout(() => {
+      fetchApi(queryName, this.state.page)
+        .then((res) => {
+          return this.setState((prevState) => ({
+            imageName: [...prevState.imageName, ...res],
+            status: "resolved",
+          }));
+        })
+        .catch((error) => {
+          this.setState({ status: "rejected" });
+        });
+    }, 1000);
   };
 
   showModal = (e) => {
@@ -77,30 +81,51 @@ export default class FetchItems extends Component {
     const { imageName, status, showModal, idImage } = this.state;
     return (
       <>
+        {status === "resolved" || status === "pending" ? (
+          <>
+            <ItemsCard>
+              {imageName.map(({ id, webformatURL, tags }) => {
+                return (
+                  <li className={s.item} key={id}>
+                    <img
+                      width="300px"
+                      height="250px"
+                      onClick={this.showModal}
+                      id={id}
+                      src={webformatURL}
+                      alt={tags}
+                    />
+                  </li>
+                );
+              })}
+            </ItemsCard>
+          </>
+        ) : null}
         {status === "pending" ? (
           <div className={s.loaderWrapper}>
             <ThreeDots color="#00BFFF" height={80} width={80} />
           </div>
         ) : null}
-
         {status === "resolved" ? (
-          <>
-            <ItemsCard>
-              {imageName.map(({ id, webformatURL, tags }) => {
-                return (
-                  <li onClick={this.showModal} key={id}>
-                    <img id={id} src={webformatURL} alt={tags} />
-                  </li>
-                );
-              })}
-            </ItemsCard>
-            <div className={s.containerBtn} onClick={this.loadMore}>
-              <LoadMore />
-            </div>
-          </>
+          <div className={s.containerBtn} onClick={this.loadMore}>
+            <LoadMore />
+          </div>
         ) : null}
         {status === "rejected" ? (
-          <p>{`Картинку с именем ${this.props.searchName} не найдено. Введите корректный запрос`}</p>
+          <>
+            <div className={s.containerDontCorrectly}>
+              <p>
+                <b>{`Картинку с именем ${this.props.searchName} не найдено или они закончились`}</b>
+              </p>
+
+              <img
+                src={imgNotCorrectly}
+                alt={"Pictures is not fined"}
+                width="400px"
+                height="400px"
+              />
+            </div>
+          </>
         ) : (
           ""
         )}
