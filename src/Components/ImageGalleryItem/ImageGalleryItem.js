@@ -1,8 +1,7 @@
 import { Component } from "react";
+import PropTypes from "prop-types";
 import s from "./ImageGalleryItem.module.css";
 import { ThreeDots } from "react-loader-spinner";
-import Notiflix from "notiflix";
-import { Notify } from "notiflix/build/notiflix-notify-aio";
 import ItemsCard from "../ImageGallery/ImageGallery";
 import fetchApi from "../serviseApi.js/fecthApi";
 import LoadMore from "../Button/Button";
@@ -137,3 +136,10 @@ export default class FetchItems extends Component {
     );
   }
 }
+
+FetchItems.propTypes = {
+  name: PropTypes.string,
+  page: PropTypes.number,
+  status: PropTypes.string,
+  showModal: PropTypes.bool,
+};
