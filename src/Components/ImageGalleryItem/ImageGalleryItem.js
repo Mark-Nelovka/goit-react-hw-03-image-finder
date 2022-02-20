@@ -46,14 +46,12 @@ export default class FetchItems extends Component {
   loadMore = (e) => {
     e.preventDefault();
     const queryName = this.props.searchName;
-    this.setState((prevState) => ({
-      page: prevState.page + 1,
-      status: "pending",
-    }));
+    this.setState({ status: "pending" });
     setTimeout(() => {
       fetchApi(queryName, this.state.page)
         .then((res) => {
           return this.setState((prevState) => ({
+            page: prevState.page + 1,
             imageName: [...prevState.imageName, ...res],
             status: "resolved",
           }));
