@@ -2,13 +2,6 @@
   margin: 0 auto;
 }
 
-.loaderWrapper {
-  display: block;
-  margin-bottom: 2px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
 .item {
   margin-left: 15px;
   margin-top: 10px;
