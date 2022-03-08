@@ -28,22 +28,38 @@ class App extends Component {
       this.setState({
         page: 1,
         status: "pending",
+        imageName: [],
       });
-      setTimeout(() => {
-        fetchApi(nextName, this.state.page)
-          .then((res) => {
-            this.setState({
-              imageName: res,
-              name: nextName,
-              page: 2,
-              status: "resolved",
-              idImage: 0,
-            });
-          })
-          .catch((error) => {
-            this.setState({ status: "rejected" });
+      await fetchApi(nextName, 1)
+        .then((res) => {
+          this.setState({
+            imageName: res,
+            name: nextName,
+            status: "resolved",
+            idImage: 0,
           });
-      }, 1000);
+        })
+        .catch((error) => {
+          this.setState({ status: "rejected" });
+        });
+      return;
+    }
+    if (prevState.page !== this.state.page && prevName === this.state.name) {
+      this.setState({
+        status: "pending",
+      });
+      fetchApi(nextName, this.state.page)
+        .then((res) => {
+          this.setState((prevState) => ({
+            imageName: [...prevState.imageName, ...res],
+            name: nextName,
+            status: "resolved",
+            idImage: 0,
+          }));
+        })
+        .catch((error) => {
+          this.setState({ status: "rejected" });
+        });
     }
   }
 
@@ -53,21 +69,9 @@ class App extends Component {
 
   loadMore = (e) => {
     e.preventDefault();
-    const queryName = this.state.imgName;
-    this.setState({ status: "pending" });
-    setTimeout(() => {
-      fetchApi(queryName, this.state.page)
-        .then((res) => {
-          return this.setState((prevState) => ({
-            page: prevState.page + 1,
-            imageName: [...prevState.imageName, ...res],
-            status: "resolved",
-          }));
-        })
-        .catch((error) => {
-          this.setState({ status: "rejected" });
-        });
-    }, 1000);
+    return this.setState((prevState) => ({
+      page: prevState.page + 1,
+    }));
   };
 
   showModalFunc = (id) => {
@@ -100,11 +104,7 @@ class App extends Component {
               <ThreeDots color="#00BFFF" height={80} width={80} />
             </div>
           ) : null}
-          {status === "resolved" ? (
-            <div className={s.containerBtn} onClick={this.loadMore}>
-              <LoadMore />
-            </div>
-          ) : null}
+          {status === "resolved" ? <LoadMore onClick={this.loadMore} /> : null}
           {status === "rejected" ? (
             <>
               <div className={s.containerDontCorrectly}>
