@@ -25,46 +25,44 @@ class App extends Component {
     const prevName = prevState.imgName;
     const nextName = this.state.imgName;
     if (prevName !== nextName) {
-      this.setState({
-        page: 1,
-        status: "pending",
-        imageName: [],
-      });
-      await fetchApi(nextName, 1)
-        .then((res) => {
-          this.setState({
-            imageName: res,
-            name: nextName,
-            status: "resolved",
-            idImage: 0,
-          });
-        })
-        .catch((error) => {
-          this.setState({ status: "rejected" });
-        });
+      this.fetchImages(true);
       return;
     }
-    if (prevState.page !== this.state.page && prevName === this.state.name) {
-      this.setState({
-        status: "pending",
-      });
-      fetchApi(nextName, this.state.page)
-        .then((res) => {
-          this.setState((prevState) => ({
-            imageName: [...prevState.imageName, ...res],
-            name: nextName,
-            status: "resolved",
-            idImage: 0,
-          }));
-        })
-        .catch((error) => {
-          this.setState({ status: "rejected" });
-        });
+    if (prevState.page !== this.state.page) {
+      this.fetchImages(false);
+      return;
     }
   }
 
+  fetchImages = async (img) => {
+    this.setState({
+      status: "pending",
+    });
+    await fetchApi(this.state.imgName, this.state.page)
+      .then((res) => {
+        if (img) {
+          this.setState({
+            imageName: res,
+            name: this.state.imgName,
+            status: "resolved",
+            idImage: 0,
+          });
+          return;
+        }
+        this.setState((prevState) => ({
+          imageName: [...prevState.imageName, ...res],
+          name: this.state.imgName,
+          status: "resolved",
+          idImage: 0,
+        }));
+      })
+      .catch((error) => {
+        this.setState({ status: "rejected" });
+      });
+  };
+
   handleFormSubmit = (painting) => {
-    this.setState({ imgName: painting });
+    this.setState({ imgName: painting, page: 1 });
   };
 
   loadMore = (e) => {
